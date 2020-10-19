@@ -4,8 +4,13 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import nl.svdoetelaar.madlevel5task1.dao.NoteDao
 import nl.svdoetelaar.madlevel5task1.model.Note
+import java.util.*
 
 @Database(entities = [Note::class], version = 1, exportSchema = false)
 abstract class NotepadRoomDatabase : RoomDatabase() {
@@ -28,6 +33,18 @@ abstract class NotepadRoomDatabase : RoomDatabase() {
                             DATABASE_NAME
                         )
                             .fallbackToDestructiveMigration()
+                            .addCallback(
+                                object : RoomDatabase.Callback() {
+                                    override fun onCreate(db: SupportSQLiteDatabase) {
+                                        super.onCreate(db)
+                                        INSTANCE?.let { notepadRoomDatabase ->
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                notepadRoomDatabase.noteDao()
+                                                    .insertNote(Note("Title", Date(), ""))
+                                            }
+                                        }
+                                    }
+                                })
                             .build()
                     }
                 }
