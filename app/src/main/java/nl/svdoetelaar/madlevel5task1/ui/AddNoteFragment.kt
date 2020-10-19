@@ -6,27 +6,61 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import nl.svdoetelaar.madlevel5task1.R
+import nl.svdoetelaar.madlevel5task1.databinding.FragmentAddNoteBinding
+import nl.svdoetelaar.madlevel5task1.viewmodel.NoteViewModel
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
 class AddNoteFragment : Fragment() {
 
+    private val viewModel: NoteViewModel by viewModels()
+
+    private lateinit var binding: FragmentAddNoteBinding
+
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_add_note, container, false)
+        binding = FragmentAddNoteBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        view.findViewById<Button>(R.id.button_second).setOnClickListener {
-//            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
-//        }
+        observeNote()
+
+        binding.btnSave.setOnClickListener {
+            saveNote()
+        }
+    }
+
+    private fun observeNote() {
+        viewModel.note.observe(viewLifecycleOwner, { note ->
+            note?.let {
+                binding.tilNoteTitle.editText?.setText(it.title)
+                binding.tilNoteText.editText?.setText(it.text)
+            }
+        })
+
+        viewModel.error.observe(viewLifecycleOwner, { message ->
+            Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+        })
+
+        viewModel.succes.observe(viewLifecycleOwner, {
+            findNavController().popBackStack()
+        })
+    }
+
+    private fun saveNote() {
+        viewModel.updateNote(
+            binding.tilNoteTitle.editText?.text.toString(),
+            binding.tilNoteText.editText?.text.toString()
+        )
     }
 }

@@ -42,7 +42,7 @@ abstract class NotepadRoomDatabase : RoomDatabase() {
                                         INSTANCE?.let { notepadRoomDatabase ->
                                             CoroutineScope(Dispatchers.IO).launch {
                                                 notepadRoomDatabase.noteDao()
-                                                    .insertNote(Note("Title", Date(), ""))
+                                                    .insertNote(Note("", Date(), ""))
                                             }
                                         }
                                     }
