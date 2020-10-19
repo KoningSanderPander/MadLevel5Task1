@@ -14,4 +14,5 @@
     <string name="note">Note</string>
     <string name="hint_title">Title</string>
     <string name="add_note">Add note</string>
+    <string name="error_title_empty">Title cannot be empty</string>
 </resources>
